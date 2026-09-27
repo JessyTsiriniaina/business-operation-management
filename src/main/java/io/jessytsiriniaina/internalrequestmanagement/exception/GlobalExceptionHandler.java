@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -38,6 +39,13 @@ public class GlobalExceptionHandler {
                         .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                         .collect(Collectors.joining(", "));
         return buildResponse(HttpStatus.BAD_REQUEST, "BAD_REQUEST", message, request.getRequestURI());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleUnreadable(
+            HttpMessageNotReadableException ex, HttpServletRequest request) {
+        return buildResponse(
+                HttpStatus.BAD_REQUEST, "BAD_REQUEST", "Malformed or unsupported request body", request.getRequestURI());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

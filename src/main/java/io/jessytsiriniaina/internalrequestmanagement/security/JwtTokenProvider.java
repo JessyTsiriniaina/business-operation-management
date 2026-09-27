@@ -25,10 +25,15 @@ public class JwtTokenProvider {
     private final long expirationMs;
 
     public JwtTokenProvider(JwtProperties props) {
-        byte[] keyBytes = props.secret().getBytes(StandardCharsets.UTF_8);
-        // HS512 needs >=64 bytes; pad if needed (still use provided secret entropy)
+        String secret = props.secret();
+        // An unresolved "${JWT_SECRET}" is bound literally by the properties binder, not rejected
+        if (secret == null || secret.isBlank() || secret.contains("${")) {
+            throw new IllegalStateException(
+                    "JWT secret is not configured. Set the JWT_SECRET environment variable (see .env.example).");
+        }
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
         if (keyBytes.length < 64) {
-            log.warn("JWT secret is shorter than 64 bytes for HS512 — consider using a longer secret");
+            log.warn("JWT secret is shorter than 64 bytes for HS512 — use a longer secret in production");
         }
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.expirationMs = props.expirationMs();
