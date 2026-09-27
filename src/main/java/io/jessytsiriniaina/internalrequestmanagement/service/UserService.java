@@ -5,6 +5,7 @@ import io.jessytsiriniaina.internalrequestmanagement.dto.user.UpdateUserDto;
 import io.jessytsiriniaina.internalrequestmanagement.dto.user.UserResponseDto;
 import io.jessytsiriniaina.internalrequestmanagement.entity.Department;
 import io.jessytsiriniaina.internalrequestmanagement.entity.User;
+import io.jessytsiriniaina.internalrequestmanagement.enums.UserRole;
 import io.jessytsiriniaina.internalrequestmanagement.exception.BusinessException;
 import io.jessytsiriniaina.internalrequestmanagement.exception.ResourceNotFoundException;
 import io.jessytsiriniaina.internalrequestmanagement.mapper.UserMapper;
@@ -45,7 +46,13 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserResponseDto findById(Long id) {
+    public UserResponseDto findById(Long id, UserPrincipal principal) {
+        if (principal != null
+                && principal.getRole() != UserRole.ADMIN
+                && principal.getRole() != UserRole.MANAGER
+                && !id.equals(principal.getId())) {
+            throw new BusinessException(HttpStatus.FORBIDDEN, "You can only view your own user profile");
+        }
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
         return UserMapper.toResponse(user);

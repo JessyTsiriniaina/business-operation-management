@@ -57,9 +57,8 @@ public class AuthService {
             dept = departmentRepository.findById(dto.departmentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Department not found: " + dto.departmentId()));
         }
-        UserRole role = dto.role() != null ? dto.role() : UserRole.EMPLOYEE;
         User user = new User(dto.firstName(), dto.lastName(), dto.email(),
-                passwordEncoder.encode(dto.password()), role, dept);
+                passwordEncoder.encode(dto.password()), UserRole.EMPLOYEE, dept);
         User saved = userRepository.save(user);
         UserPrincipal principal = UserPrincipal.fromEntity(saved);
         String token = tokenProvider.generateToken(principal);

@@ -44,8 +44,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.findById(id));
+    public ResponseEntity<UserResponseDto> findById(
+            @PathVariable Long id, @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(userService.findById(id, principal));
     }
 
     @PostMapping

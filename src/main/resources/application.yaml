@@ -26,6 +26,10 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
 jwt:
-  secret: ${JWT_SECRET:change-me-to-a-very-long-random-secret-key-for-hs512-min-64-chars-please-change-in-production}
+  secret: ${JWT_SECRET}
   expiration-ms: ${JWT_EXPIRATION_MS:3600000}
