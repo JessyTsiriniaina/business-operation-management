@@ -34,3 +34,4 @@ build/
 ### VS Code ###
 .vscode/
 .env
+BOOTSTRAP_ADMIN.local.md
